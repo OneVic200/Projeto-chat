@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <title>Bate-papo Node.js e Socket.IO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body align="center">
+  <h1>Chatzin dos cria</h1>
+  <div class="chat-container">
+    <div class="input-container">
+      <form action="">
+        <div class="input-group">
+          <input id="name" placeholder="Seu nome de usuário" autocomplete="off" />
+        </div>
+        <div class="input-group">
+          <input id="message" placeholder="Sua mensagem" autocomplete="off" />
+          <button>Enviar</button>
+        </div>
+      </form>
+    </div>
+    <ul id="messages"></ul>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const nameInput = document.getElementById('name');
+    const messageInput = document.getElementById('message');
+    const messages = document.getElementById('messages');
+    let usernameSubmitted = false;
+    document.querySelector('form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = nameInput.value;
+      const message = messageInput.value;
+      if (name.trim() && message.trim()) {
+        socket.emit('chat message', { name, message });
+        messageInput.value = '';
+        if (!usernameSubmitted) {
+          nameInput.disabled = true;
+          usernameSubmitted = true;
+        }
+      }
+    });
+    socket.on('chat message', (data) => {
+      const li = document.createElement('li');
+      li.textContent = `${data.name}: ${data.message}`;
+      messages.appendChild(li);
+    });
+  </script>
+
+  <style>
+    /* Estilos básicos */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .chat-container {
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Estilos das mensagens */
+    li {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      background-color: #ebdede;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    #name {
+      font-weight: bold;
+    }
+
+    .timestamp {
+      color: #888;
+    }
+
+    .message-content p {
+      margin: 0;
+    }
+
+    /* Estilos adicionais, como barra de rolagem */
+    .chat-container {
+      overflow-y: auto;
+      max-height: 500px;
+      border: 1px solid red;
+    }
+    
+
+    /* Estilos responsivos */
+    @media screen and (max-width: 600px) {
+      .chat-container {
+        padding: 10px;
+      }
+      #name,
+      #message,
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+
+    /* Estilos para o campo de input fixo */
+    .input-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #867b7b;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .input-container .input-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .input-container input {
+      margin-right: 10px;
+      flex-grow: 1;
+      min-width: 0;
+      border-radius: 20px;
+    }
+
+    button{
+      border-radius: 20px;
+    }
+  </style>
+</body>
+
+</html>
